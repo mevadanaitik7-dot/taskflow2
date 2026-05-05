@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TaskFlow Pro">
+    <title>TaskFlow Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+    --bg-primary: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --bg-card: #16213e;
+    --bg-card-hover: #1b2a4a;
+    --text-primary: #e8e8e8;
+    --text-secondary: #a0a0b0;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --accent3: #533483;
+    --success: #2ed573;
+    --warning: #ffa502;
+    --danger: #ff4757;
+    --info: #1e90ff;
+    --very-important: #ff4757;
+    --important: #ffa502;
+    --normal: #1e90ff;
+    --low: #a0a0b0;
+    --daily: #48dbfb;
+    --shadow: 0 4px 15px rgba(0,0,0,0.3);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --nav-height: 64px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+body { padding-bottom: calc(var(--nav-height) + 20px); }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+/* SPLASH */
+.splash-screen {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: linear-gradient(135deg, #0f0f1a, #1a1a2e, #16213e);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999;
+}
+.splash-content { text-align:center; }
+.splash-icon { font-size:60px; color:var(--accent); margin-bottom:15px; animation:pulse 1s ease infinite; }
+.splash-content h1 { font-size:32px; font-weight:800; background:linear-gradient(135deg,var(--accent),#ff6b9d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.splash-content p { color:var(--text-secondary); font-size:14px; margin-top:5px; }
+.splash-loader { width:40px; height:40px; border:3px solid var(--bg-card); border-top-color:var(--accent); border-radius:50%; margin:20px auto; animation:spin 0.8s linear infinite; }
+.made-by { color:var(--text-secondary); font-size:11px; display:block; margin-top:10px; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+@keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+@keyframes toastOut { to{opacity:0;transform:translateX(-50%) translateY(20px)} }
+
+.hidden { display:none !important; }
+
+/* HEADER */
+.app-header {
+    position:sticky; top:0; background:var(--bg-secondary); padding:12px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+    z-index:100; border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.header-left h1 { font-size:20px; font-weight:700; background:linear-gradient(135deg,var(--accent),#ff6b9d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.header-left h1 i { -webkit-text-fill-color:var(--accent); }
+.header-right { display:flex; align-items:center; gap:10px; }
+.today-date { font-size:11px; color:var(--text-secondary); background:var(--bg-card); padding:4px 10px; border-radius:20px; }
+.btn-icon { background:var(--bg-card); border:none; color:var(--accent); width:36px; height:36px; border-radius:50%; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s; }
+.btn-icon:active { transform:scale(0.9); background:var(--accent); color:white; }
+
+/* QUOTE */
+.quote-banner { background:linear-gradient(135deg,var(--accent3),var(--accent2)); margin:10px 12px; padding:12px 16px; border-radius:var(--radius); font-size:12px; line-height:1.5; position:relative; overflow:hidden; }
+.quote-banner::before { content:'"'; position:absolute; top:-10px; left:8px; font-size:60px; opacity:0.1; font-family:serif; }
+.quote-banner p { font-style:italic; color:rgba(255,255,255,0.9); }
+.quote-banner span { display:block; text-align:right; margin-top:5px; font-size:10px; color:rgba(255,255,255,0.6); }
+
+/* NAV */
+.bottom-nav {
+    position:fixed; bottom:0; left:0; right:0; height:var(--nav-height);
+    background:var(--bg-secondary); display:flex; align-items:center;
+    justify-content:space-around; border-top:1px solid rgba(255,255,255,0.05);
+    z-index:200; padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.nav-btn { background:none; border:none; color:var(--text-secondary); display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; font-family:'Poppins',sans-serif; cursor:pointer; padding:6px 8px; border-radius:10px; transition:all 0.3s; min-width:50px; }
+.nav-btn i { font-size:18px; }
+.nav-btn.active { color:var(--accent); background:rgba(233,69,96,0.1); }
+.nav-btn:active { transform:scale(0.9); }
+
+/* TABS */
+.tab-contents { padding:0 0 80px 0; }
+.tab-content { display:none; padding:10px 12px; animation:fadeIn 0.3s ease; }
+.tab-content.active { display:block; }
+
+/* DATE NAV */
+.date-navigator { display:flex; align-items:center; justify-content:space-between; background:var(--bg-card); padding:10px 14px; border-radius:var(--radius); margin-bottom:12px; }
+.date-navigator button { background:var(--bg-secondary); border:none; color:var(--text-primary); width:34px; height:34px; border-radius:50%; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+.date-navigator button:active { background:var(--accent); transform:scale(0.9); }
+.date-display { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; }
+.btn-today { background:var(--accent); border:none; color:white; padding:3px 10px; border-radius:20px; font-size:10px; font-family:'Poppins',sans-serif; cursor:pointer; }
+
+/* SUMMARY */
+.task-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+.summary-item { background:var(--bg-card); padding:10px; border-radius:var(--radius-sm); text-align:center; border-left:3px solid var(--accent); }
+.summary-item.completed { border-left-color:var(--success); }
+.summary-item.pending { border-left-color:var(--warning); }
+.summary-number { display:block; font-size:22px; font-weight:700; }
+.summary-label { font-size:10px; color:var(--text-secondary); text-transform:uppercase; }
+
+/* FAB */
+.fab-add { position:fixed; bottom:calc(var(--nav-height) + 16px); right:16px; width:52px; height:52px; background:linear-gradient(135deg,var(--accent),#ff6b9d); border:none; border-radius:50%; color:white; font-size:22px; cursor:pointer; box-shadow:0 4px 20px rgba(233,69,96,0.4); z-index:150; display:flex; align-items:center; justify-content:center; transition:all 0.3s; }
+.fab-add:active { transform:scale(0.9) rotate(90deg); }
+
+/* SECTION HEADERS */
+.section-header { display:flex; align-items:center; justify-content:space-between; padding:8px 4px; margin-top:6px; }
+.section-header h3 { font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; }
+.section-header h3 i { font-size:12px; }
+.btn-small { background:var(--bg-card); border:1px solid rgba(255,255,255,0.1); color:var(--text-secondary); padding:4px 10px; border-radius:20px; font-size:10px; font-family:'Poppins',sans-serif; cursor:pointer; display:flex; align-items:center; gap:4px; }
+
+/* TASK ITEM */
+.task-item { background:var(--bg-card); padding:12px 14px; border-radius:var(--radius-sm); margin-bottom:8px; display:flex; align-items:center; gap:12px; transition:all 0.3s; border-left:4px solid var(--normal); position:relative; overflow:hidden; }
+.task-item.priority-very-important { border-left-color:var(--very-important); }
+.task-item.priority-important { border-left-color:var(--important); }
+.task-item.priority-normal { border-left-color:var(--normal); }
+.task-item.priority-low { border-left-color:var(--low); }
+.task-item.priority-daily { border-left-color:var(--daily); }
+.task-item.completed { opacity:0.6; }
+.task-item.completed .task-name { text-decoration:line-through; color:var(--text-secondary); }
+.task-checkbox { width:22px; height:22px; border:2px solid var(--text-secondary); border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.3s; }
+.task-checkbox.checked { background:var(--success); border-color:var(--success); }
+.task-checkbox.checked::after { content:'✓'; color:white; font-size:12px; font-weight:700; }
+.task-info { flex:1; min-width:0; }
+.task-name { font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.task-meta { font-size:10px; color:var(--text-secondary); margin-top:2px; display:flex; align-items:center; gap:6px; }
+.task-priority-badge { padding:1px 6px; border-radius:10px; font-size:9px; font-weight:600; text-transform:uppercase; }
+.badge-very-important { background:rgba(255,71,87,0.2); color:var(--very-important); }
+.badge-important { background:rgba(255,165,2,0.2); color:var(--important); }
+.badge-normal { background:rgba(30,144,255,0.2); color:var(--normal); }
+.badge-low { background:rgba(160,160,176,0.2); color:var(--low); }
+.badge-daily { background:rgba(72,219,251,0.2); color:var(--daily); }
+.task-delete { background:none; border:none; color:var(--text-secondary); font-size:14px; cursor:pointer; padding:6px; border-radius:50%; transition:all 0.2s; flex-shrink:0; }
+.task-delete:active { color:var(--danger); background:rgba(255,71,87,0.1); }
+.task-color-bar { width:3px; height:100%; position:absolute; right:0; top:0; border-radius:0 4px 4px 0; }
+
+/* EMPTY */
+.empty-state { text-align:center; padding:40px 20px; color:var(--text-secondary); }
+.empty-state i { font-size:48px; opacity:0.3; margin-bottom:12px; display:block; }
+.empty-state p { font-size:16px; font-weight:600; margin-bottom:5px; color:var(--text-primary); opacity:0.7; }
+.empty-state span { font-size:12px; }
+
+/* MODALS */
+.modal { position:fixed; top:0; left:0; width:100%; height:100%; z-index:500; display:flex; align-items:flex-end; justify-content:center; }
+.modal.hidden { display:none !important; }
+.modal-overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); }
+.modal-content { position:relative; background:var(--bg-secondary); width:100%; max-width:500px; max-height:85vh; border-radius:20px 20px 0 0; overflow-y:auto; animation:slideUp 0.3s ease; }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid rgba(255,255,255,0.05); position:sticky; top:0; background:var(--bg-secondary); z-index:1; }
+.modal-header h3 { font-size:16px; display:flex; align-items:center; gap:8px; }
+.modal-close { background:var(--bg-card); border:none; color:var(--text-secondary); width:32px; height:32px; border-radius:50%; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.modal-body { padding:16px 18px; }
+.modal-footer { display:flex; gap:10px; padding:14px 18px; border-top:1px solid rgba(255,255,255,0.05); }
+
+/* FORMS */
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group textarea,
+.form-group select { width:100%; background:var(--bg-card); border:1px solid rgba(255,255,255,0.1); color:var(--text-primary); padding:10px 14px; border-radius:var(--radius-sm); font-size:14px; font-family:'Poppins',sans-serif; outline:none; transition:border-color 0.3s; }
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus { border-color:var(--accent); }
+.form-group textarea { resize:vertical; min-height:80px; }
+.inline-form { display:flex; gap:8px; }
+.inline-form input { flex:1; }
+.inline-form .btn-primary { padding:10px 14px; flex-shrink:0; }
+
+/* PRIORITY */
+.priority-selector { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.priority-btn { background:var(--bg-card); border:2px solid transparent; color:var(--text-secondary); padding:8px 10px; border-radius:var(--radius-sm); font-size:11px; font-family:'Poppins',sans-serif; cursor:pointer; display:flex; align-items:center; gap:5px; justify-content:center; transition:all 0.2s; }
+.priority-btn.very-important.active { border-color:var(--very-important); color:var(--very-important); background:rgba(255,71,87,0.1); }
+.priority-btn.important.active { border-color:var(--important); color:var(--important); background:rgba(255,165,2,0.1); }
+.priority-btn.normal.active { border-color:var(--normal); color:var(--normal); background:rgba(30,144,255,0.1); }
+.priority-btn.low.active { border-color:var(--low); color:var(--low); background:rgba(160,160,176,0.1); }
+
+/* COLORS */
+.color-picker { display:flex; gap:8px; flex-wrap:wrap; }
+.color-btn { width:30px; height:30px; border:2px solid transparent; border-radius:50%; cursor:pointer; transition:all 0.2s; }
+.color-btn.selected { border-color:white; transform:scale(1.15); }
+
+/* BUTTONS */
+.btn-primary { background:linear-gradient(135deg,var(--accent),#ff6b9d); border:none; color:white; padding:10px 20px; border-radius:var(--radius-sm); font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; cursor:pointer; flex:1; transition:all 0.2s; }
+.btn-primary:active { transform:scale(0.96); }
+.btn-cancel { background:var(--bg-card); border:1px solid rgba(255,255,255,0.1); color:var(--text-secondary); padding:10px 20px; border-radius:var(--radius-sm); font-size:13px; font-family:'Poppins',sans-serif; cursor:pointer; flex:1; }
+.btn-link { background:none; border:none; color:var(--accent); font-size:12px; font-family:'Poppins',sans-serif; cursor:pointer; text-decoration:underline; margin-top:8px; }
+
+/* DAILY MANAGER */
+.daily-tasks-manager { margin-top:12px; }
+.daily-task-manage-item { display:flex; align-items:center; justify-content:space-between; background:var(--bg-card); padding:10px 14px; border-radius:var(--radius-sm); margin-bottom:6px; border-left:3px solid var(--daily); }
+.daily-task-manage-item span { font-size:13px; }
+.daily-task-manage-item button { background:none; border:none; color:var(--danger); font-size:14px; cursor:pointer; padding:4px; }
+
+/* PROGRESS */
+.progress-card { background:var(--bg-card); padding:16px; border-radius:var(--radius); margin-bottom:14px; }
+.progress-card h3 { font-size:14px; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.monthly-card { text-align:center; }
+.monthly-circle-container { display:flex; justify-content:center; margin-bottom:14px; }
+.circle-progress { position:relative; width:120px; height:120px; }
+.circle-progress svg { width:120px; height:120px; transform:rotate(-90deg); }
+.circle-bg { fill:none; stroke:var(--bg-secondary); stroke-width:8; }
+.circle-fill { fill:none; stroke:var(--accent); stroke-width:8; stroke-linecap:round; stroke-dasharray:326.7; stroke-dashoffset:326.7; transition:stroke-dashoffset 1s ease; }
+.circle-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.circle-percent { font-size:22px; font-weight:700; display:block; color:var(--accent); }
+.circle-label { font-size:9px; color:var(--text-secondary); text-transform:uppercase; }
+.monthly-stats { display:flex; justify-content:space-around; margin-top:10px; }
+.stat-item { text-align:center; }
+.stat-num { display:block; font-size:18px; font-weight:700; }
+.stat-lbl { font-size:10px; color:var(--text-secondary); }
+.chart-date-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding:0 4px; }
+.chart-date-nav button { background:var(--bg-secondary); border:none; color:var(--text-primary); width:28px; height:28px; border-radius:50%; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.chart-date-nav span { font-size:11px; color:var(--text-secondary); }
+.chart-wrapper { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:5px; }
+.chart-container { display:flex; align-items:flex-end; gap:4px; min-height:120px; height:120px; padding:0 2px; }
+.chart-bar-group { display:flex; flex-direction:column; align-items:center; min-width:28px; flex-shrink:0; }
+.chart-bar-stack { width:18px; display:flex; flex-direction:column-reverse; height:90px; position:relative; }
+.chart-bar-segment { width:100%; border-radius:3px 3px 0 0; min-height:0; transition:height 0.5s ease; }
+.chart-bar-segment.completed-bar { background:linear-gradient(to top,#2ed573,#7bed9f); }
+.chart-bar-segment.missed-bar { background:linear-gradient(to top,#ff4757,#ff6b81); border-radius:0; }
+.chart-bar-label { font-size:8px; color:var(--text-secondary); margin-top:4px; text-align:center; }
+.chart-legend { display:flex; justify-content:center; gap:16px; margin-top:10px; }
+.legend-item { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--text-secondary); }
+.legend-dot { width:10px; height:10px; border-radius:3px; }
+.completed-dot { background:var(--success); }
+.missed-dot { background:var(--danger); }
+.yearly-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:4px; }
+.year-month-cell { aspect-ratio:1; border-radius:4px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:8px; cursor:pointer; transition:all 0.2s; }
+.year-month-cell .month-abbr { font-weight:600; margin-bottom:1px; }
+.year-month-cell .month-pct { font-size:7px; opacity:0.8; }
+
+/* STUDY */
+.study-section { background:var(--bg-card); padding:16px; border-radius:var(--radius); margin-bottom:14px; }
+.study-section h3 { font-size:14px; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.stopwatch-display { text-align:center; padding:20px; }
+#stopwatchTime, #timerTime { font-size:42px; font-weight:700; font-variant-numeric:tabular-nums; background:linear-gradient(135deg,var(--accent),#ff6b9d); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stopwatch-controls { display:flex; gap:10px; justify-content:center; }
+.sw-btn { padding:10px 24px; border:none; border-radius:25px; font-size:13px; font-weight:600; font-family:'Poppins',sans-serif; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s; }
+.sw-btn.start { background:linear-gradient(135deg,var(--success),#7bed9f); color:#000; }
+.sw-btn.start.running { background:linear-gradient(135deg,var(--warning),#ffd43b); }
+.sw-btn.reset { background:var(--bg-secondary); color:var(--text-secondary); }
+.sw-btn:active { transform:scale(0.95); }
+.sw-running-info { text-align:center; margin-top:10px; font-size:12px; color:var(--text-secondary); }
+.timer-setup { margin-bottom:14px; }
+.timer-inputs { display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:12px; }
+.timer-input-group { text-align:center; }
+.timer-input-group input { width:60px; background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.1); color:var(--text-primary); padding:8px; border-radius:var(--radius-sm); font-size:20px; font-weight:600; text-align:center; font-family:'Poppins',sans-serif; outline:none; }
+.timer-input-group label { font-size:9px; color:var(--text-secondary); display:block; margin-top:3px; }
+.timer-colon { font-size:24px; font-weight:700; color:var(--text-secondary); padding-bottom:15px; }
+.timer-presets { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
+.timer-presets button { background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.1); color:var(--text-secondary); padding:5px 12px; border-radius:20px; font-size:11px; font-family:'Poppins',sans-serif; cursor:pointer; }
+.timer-presets button:active { background:var(--accent); color:white; }
+.today-study-total { text-align:center; font-size:14px; color:var(--text-secondary); margin-bottom:12px; padding:8px; background:var(--bg-secondary); border-radius:var(--radius-sm); }
+.today-study-total span { font-weight:700; color:var(--accent); }
+.sessions-list { max-height:300px; overflow-y:auto; }
+.session-item { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--bg-secondary); border-radius:var(--radius-sm); margin-bottom:6px; border-left:3px solid var(--accent); }
+.session-item .session-time-range { font-size:11px; color:var(--text-secondary); }
+.session-item .session-duration { font-size:13px; font-weight:600; color:var(--success); }
+.session-item .session-date { font-size:10px; color:var(--text-secondary); }
+.study-month-stats { display:flex; justify-content:space-around; margin-top:14px; }
+
+/* SKILLS */
+.section-top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.section-top-bar h3 { font-size:16px; font-weight:600; display:flex; align-items:center; gap:8px; }
+.lock-screen { display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+.lock-content { text-align:center; width:100%; max-width:300px; }
+.lock-content i { font-size:48px; color:var(--accent); margin-bottom:12px; }
+.lock-content p { font-size:13px; color:var(--text-secondary); margin-bottom:16px; }
+.lock-content input { width:120px; background:var(--bg-card); border:2px solid rgba(255,255,255,0.1); color:var(--text-primary); padding:10px; border-radius:var(--radius-sm); font-size:24px; text-align:center; font-family:'Poppins',sans-serif; outline:none; letter-spacing:8px; margin-bottom:14px; display:block; margin-left:auto; margin-right:auto; }
+.lock-content input:focus { border-color:var(--accent); }
+.lock-content .btn-primary { width:120px; }
+.skills-content { padding-top:5px; }
+.skills-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.skill-card { background:var(--bg-card); padding:14px; border-radius:var(--radius); cursor:pointer; transition:all 0.2s; border-top:3px solid var(--accent); }
+.skill-card:active { transform:scale(0.97); background:var(--bg-card-hover); }
+.skill-card h4 { font-size:13px; font-weight:600; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.skill-card .skill-level-badge { font-size:9px; padding:2px 8px; border-radius:10px; display:inline-block; }
+.level-Beginner { background:rgba(30,144,255,0.2); color:var(--info); }
+.level-Intermediate { background:rgba(255,165,2,0.2); color:var(--warning); }
+.level-Advanced { background:rgba(46,213,115,0.2); color:var(--success); }
+.level-Expert { background:rgba(233,69,96,0.2); color:var(--accent); }
+.skill-detail-level { margin-bottom:14px; }
+.skill-detail-notes { background:var(--bg-card); padding:14px; border-radius:var(--radius-sm); font-size:13px; line-height:1.7; white-space:pre-wrap; color:var(--text-secondary); min-height:100px; }
+
+/* GOALS */
+.goals-list { display:flex; flex-direction:column; gap:10px; }
+.goal-card { background:var(--bg-card); padding:14px; border-radius:var(--radius); border-left:4px solid var(--accent3); position:relative; }
+.goal-card .goal-category { font-size:9px; padding:2px 8px; border-radius:10px; background:rgba(83,52,131,0.3); color:#a55eea; display:inline-block; margin-bottom:6px; }
+.goal-card h4 { font-size:14px; font-weight:600; margin-bottom:4px; }
+.goal-card .goal-desc { font-size:12px; color:var(--text-secondary); line-height:1.5; white-space:pre-wrap; }
+.goal-card .goal-target { font-size:10px; color:var(--accent); margin-top:6px; }
+.goal-card .goal-actions { position:absolute; top:10px; right:10px; display:flex; gap:6px; }
+.goal-card .goal-actions button { background:none; border:none; color:var(--text-secondary); font-size:13px; cursor:pointer; padding:4px; }
+.goal-card .goal-actions button:active { color:var(--accent); }
+.goal-card.goal-completed { opacity:0.6; }
+.goal-card.goal-completed h4 { text-decoration:line-through; }
+
+/* HISTORY */
+.history-list { display:flex; flex-direction:column; gap:8px; }
+.history-day { background:var(--bg-card); padding:12px 14px; border-radius:var(--radius-sm); }
+.history-day-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.history-day-header h4 { font-size:13px; font-weight:600; }
+.history-day-header span { font-size:11px; color:var(--text-secondary); }
+.history-task { display:flex; align-items:center; gap:8px; padding:5px 0; font-size:12px; }
+.history-task i { font-size:10px; }
+.history-task.hist-completed i { color:var(--success); }
+.history-task.hist-missed i { color:var(--danger); }
+
+/* QUOTE MODAL */
+.quote-modal-content { text-align:center; padding:30px 20px; border-radius:20px 20px 0 0; }
+.quote-full { margin-bottom:20px; }
+.quote-full i { font-size:32px; color:var(--accent); opacity:0.5; margin-bottom:10px; }
+.quote-full p { font-size:18px; font-weight:500; line-height:1.6; font-style:italic; margin-bottom:10px; }
+.quote-full span { font-size:13px; color:var(--text-secondary); }
+
+/* FOOTER */
+.app-footer { text-align:center; padding:14px; font-size:11px; color:var(--text-secondary); opacity:0.5; }
+
+/* TOAST */
+.toast { position:fixed; bottom:calc(var(--nav-height) + 70px); left:50%; transform:translateX(-50%); background:var(--bg-card); color:var(--text-primary); padding:10px 20px; border-radius:25px; font-size:12px; font-weight:500; box-shadow:var(--shadow); z-index:600; animation:toastIn 0.3s ease, toastOut 0.3s ease 2.2s forwards; white-space:nowrap; }
+
+/* RESPONSIVE */
+@media (max-width:380px) {
+    .nav-btn { min-width:42px; padding:4px 5px; }
+    .nav-btn span { font-size:8px; }
+    .nav-btn i { font-size:16px; }
+    #stopwatchTime, #timerTime { font-size:34px; }
+    .skills-list { grid-template-columns:1fr; }
+}
+@media (min-width:600px) {
+    .tab-contents,.app-header { max-width:500px; margin:0 auto; }
+    .bottom-nav { max-width:500px; margin:0 auto; left:50%; transform:translateX(-50%); border-radius:16px 16px 0 0; }
+    .fab-add { right:calc(50% - 230px); }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Splash -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-icon"><i class="fas fa-bolt"></i></div>
+      <h1>TaskFlow Pro</h1>
+      <p>Conquer Your Day</p>
+      <div class="splash-loader"></div>
+      <span class="made-by">Made by Naitik</span>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" class="main-app hidden">
+    <header class="app-header">
+      <div class="header-left"><h1><i class="fas fa-bolt"></i> TaskFlow</h1></div>
+      <div class="header-right">
+        <span class="today-date" id="headerDate"></span>
+        <button class="btn-icon" onclick="showQuote()"><i class="fas fa-quote-right"></i></button>
+      </div>
+    </header>
+
+    <div id="quoteBanner" class="quote-banner">
+      <p id="quoteText"></p>
+      <span id="quoteAuthor"></span>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-tab="tasks" onclick="switchTab('tasks')"><i class="fas fa-tasks"></i><span>Tasks</span></button>
+      <button class="nav-btn" data-tab="progress" onclick="switchTab('progress')"><i class="fas fa-chart-line"></i><span>Progress</span></button>
+      <button class="nav-btn" data-tab="study" onclick="switchTab('study')"><i class="fas fa-book-reader"></i><span>Study</span></button>
+      <button class="nav-btn" data-tab="skills" onclick="switchTab('skills')"><i class="fas fa-brain"></i><span>Skills</span></button>
+      <button class="nav-btn" data-tab="lifegoals" onclick="switchTab('lifegoals')"><i class="fas fa-star"></i><span>Goals</span></button>
+      <button class="nav-btn" data-tab="history" onclick="switchTab('history')"><i class="fas fa-history"></i><span>History</span></button>
+    </nav>
+
+    <div class="tab-contents">
+
+      <!-- TASKS -->
+      <div id="tab-tasks" class="tab-content active">
+        <div class="date-navigator">
+          <button onclick="changeDate(-1)"><i class="fas fa-chevron-left"></i></button>
+          <div class="date-display">
+            <span id="currentDateDisplay"></span>
+            <button class="btn-today" onclick="goToToday()">Today</button>
+          </div>
+          <button onclick="changeDate(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="task-summary">
+          <div class="summary-item"><span class="summary-number" id="totalTasks">0</span><span class="summary-label">Total</span></div>
+          <div class="summary-item completed"><span class="summary-number" id="completedTasks">0</span><span class="summary-label">Done</span></div>
+          <div class="summary-item pending"><span class="summary-number" id="pendingTasks">0</span><span class="summary-label">Pending</span></div>
+        </div>
+        <button class="fab-add" onclick="openAddTask()"><i class="fas fa-plus"></i></button>
+        <div class="section-header" id="dailyTasksHeader" style="display:none;"><h3><i class="fas fa-redo"></i> Daily Tasks</h3><button class="btn-small" onclick="openManageDailyTasks()"><i class="fas fa-cog"></i> Manage</button></div>
+        <div id="dailyTasksList" class="task-list"></div>
+        <div class="section-header" id="veryImportantHeader" style="display:none;"><h3><i class="fas fa-fire"></i> Very Important</h3></div>
+        <div id="veryImportantList" class="task-list"></div>
+        <div class="section-header" id="importantHeader" style="display:none;"><h3><i class="fas fa-exclamation-circle"></i> Important</h3></div>
+        <div id="importantList" class="task-list"></div>
+        <div class="section-header" id="normalHeader" style="display:none;"><h3><i class="fas fa-minus-circle"></i> Normal</h3></div>
+        <div id="normalList" class="task-list"></div>
+        <div class="section-header" id="lowHeader" style="display:none;"><h3><i class="fas fa-arrow-down"></i> Low Priority</h3></div>
+        <div id="lowList" class="task-list"></div>
+        <div id="emptyState" class="empty-state"><i class="fas fa-clipboard-list"></i><p>No tasks for this day</p><span>Tap + to add a new task</span></div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div id="tab-progress" class="tab-content">
+        <div class="date-navigator">
+          <button onclick="changeProgressMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+          <div class="date-display"><span id="progressMonthDisplay"></span></div>
+          <button onclick="changeProgressMonth(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="progress-card monthly-card">
+          <h3><i class="fas fa-calendar-check"></i> Monthly Overview</h3>
+          <div class="monthly-circle-container">
+            <div class="circle-progress" id="monthlyCircle">
+              <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="circle-bg"/><circle cx="60" cy="60" r="52" class="circle-fill" id="monthlyCircleFill"/></svg>
+              <div class="circle-text"><span class="circle-percent" id="monthlyPercent">0%</span><span class="circle-label">Complete</span></div>
+            </div>
+          </div>
+          <div class="monthly-stats">
+            <div class="stat-item"><span class="stat-num" id="monthCompleted">0</span><span class="stat-lbl">Completed</span></div>
+            <div class="stat-item"><span class="stat-num" id="monthTotal">0</span><span class="stat-lbl">Total</span></div>
+            <div class="stat-item"><span class="stat-num" id="monthMissed">0</span><span class="stat-lbl">Missed</span></div>
+          </div>
+        </div>
+        <div class="progress-card">
+          <h3><i class="fas fa-chart-bar"></i> Daily Progress</h3>
+          <div class="chart-date-nav">
+            <button onclick="scrollChart(-1)"><i class="fas fa-chevron-left"></i></button>
+            <span id="chartRangeLabel"></span>
+            <button onclick="scrollChart(1)"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="chart-wrapper"><div class="chart-container" id="dailyChart"></div></div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot completed-dot"></span>Completed</span>
+            <span class="legend-item"><span class="legend-dot missed-dot"></span>Missed</span>
+          </div>
+        </div>
+        <div class="progress-card">
+          <h3><i class="fas fa-calendar-alt"></i> Yearly Overview <span id="yearLabel"></span></h3>
+          <div class="yearly-grid" id="yearlyGrid"></div>
+        </div>
+      </div>
+
+      <!-- STUDY -->
+      <div id="tab-study" class="tab-content">
+        <div class="study-section">
+          <h3><i class="fas fa-stopwatch"></i> Study Stopwatch</h3>
+          <div class="stopwatch-display"><span id="stopwatchTime">00:00:00</span></div>
+          <div class="stopwatch-controls">
+            <button class="sw-btn start" id="swStartBtn" onclick="toggleStopwatch()"><i class="fas fa-play"></i> Start</button>
+            <button class="sw-btn reset" onclick="resetStopwatch()"><i class="fas fa-undo"></i> Reset</button>
+          </div>
+          <div id="swRunningInfo" class="sw-running-info" style="display:none;"><p>Started at: <span id="swStartTime"></span></p></div>
+        </div>
+        <div class="study-section">
+          <h3><i class="fas fa-hourglass-half"></i> Timer</h3>
+          <div class="timer-setup" id="timerSetup">
+            <div class="timer-inputs">
+              <div class="timer-input-group"><input type="number" id="timerHours" value="0" min="0" max="23"><label>Hours</label></div>
+              <span class="timer-colon">:</span>
+              <div class="timer-input-group"><input type="number" id="timerMinutes" value="25" min="0" max="59"><label>Min</label></div>
+              <span class="timer-colon">:</span>
+              <div class="timer-input-group"><input type="number" id="timerSeconds" value="0" min="0" max="59"><label>Sec</label></div>
+            </div>
+            <div class="timer-presets">
+              <button onclick="setTimerPreset(25)">25 min</button>
+              <button onclick="setTimerPreset(45)">45 min</button>
+              <button onclick="setTimerPreset(60)">1 hr</button>
+              <button onclick="setTimerPreset(120)">2 hr</button>
+            </div>
+          </div>
+          <div class="stopwatch-display" id="timerDisplay" style="display:none;"><span id="timerTime">00:25:00</span></div>
+          <div class="stopwatch-controls">
+            <button class="sw-btn start" id="timerStartBtn" onclick="toggleTimer()"><i class="fas fa-play"></i> Start</button>
+            <button class="sw-btn reset" onclick="resetTimer()"><i class="fas fa-undo"></i> Reset</button>
+          </div>
+        </div>
+        <div class="study-section">
+          <h3><i class="fas fa-clock"></i> Today's Sessions</h3>
+          <div class="today-study-total">Total: <span id="todayStudyTotal">0h 0m 0s</span></div>
+          <div id="todaySessionsList" class="sessions-list"></div>
+        </div>
+        <div class="study-section">
+          <h3><i class="fas fa-chart-area"></i> Study Progress</h3>
+          <div class="date-navigator">
+            <button onclick="changeStudyMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+            <span id="studyMonthLabel"></span>
+            <button onclick="changeStudyMonth(1)"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="chart-wrapper"><div class="chart-container" id="studyChart"></div></div>
+          <div class="study-month-stats">
+            <div class="stat-item"><span class="stat-num" id="studyMonthTotal">0h</span><span class="stat-lbl">This Month</span></div>
+            <div class="stat-item"><span class="stat-num" id="studyMonthAvg">0h</span><span class="stat-lbl">Daily Avg</span></div>
+            <div class="stat-item"><span class="stat-num" id="studyYearTotal">0h</span><span class="stat-lbl">This Year</span></div>
+          </div>
+        </div>
+        <div class="study-section">
+          <h3><i class="fas fa-history"></i> Session History</h3>
+          <div id="studyHistoryList" class="sessions-list"></div>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div id="tab-skills" class="tab-content">
+        <div class="section-top-bar">
+          <h3><i class="fas fa-brain"></i> My Skills</h3>
+          <button class="btn-small" onclick="openAddSkill()"><i class="fas fa-plus"></i> Add Skill</button>
+        </div>
+        <div id="skillsLockScreen" class="lock-screen">
+          <div class="lock-content">
+            <i class="fas fa-lock"></i>
+            <p>Enter PIN to access your Skills</p>
+            <input type="password" id="skillsPinInput" maxlength="4" placeholder="••••" inputmode="numeric">
+            <button class="btn-primary" onclick="unlockSkills()">Unlock</button>
+            <button class="btn-link" id="skillsSetPinBtn" onclick="setSkillsPin()" style="display:none;">Set New PIN</button>
+          </div>
+        </div>
+        <div id="skillsContent" class="skills-content hidden">
+          <div id="skillsList" class="skills-list"></div>
+          <div id="emptySkills" class="empty-state"><i class="fas fa-brain"></i><p>No skills added yet</p><span>Add your skills to track them</span></div>
+        </div>
+      </div>
+
+      <!-- LIFE GOALS -->
+      <div id="tab-lifegoals" class="tab-content">
+        <div class="section-top-bar">
+          <h3><i class="fas fa-star"></i> Life Goals & Dreams</h3>
+          <button class="btn-small" onclick="openAddLifeGoal()"><i class="fas fa-plus"></i> Add Goal</button>
+        </div>
+        <div id="lifeGoalsList" class="goals-list"></div>
+        <div id="emptyGoals" class="empty-state"><i class="fas fa-rocket"></i><p>No life goals added yet</p><span>Dream big! Add your life goals here</span></div>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="tab-history" class="tab-content">
+        <div class="section-top-bar">
+          <h3><i class="fas fa-history"></i> Task History</h3>
+          <select id="historyFilter" onchange="loadHistory()">
+            <option value="all">All Time</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="3months">Last 3 Months</option>
+          </select>
+        </div>
+        <div id="historyList" class="history-list"></div>
+        <div id="emptyHistory" class="empty-state"><i class="fas fa-archive"></i><p>No history yet</p><span>Complete tasks to build your history</span></div>
+      </div>
+
+    </div>
+    <div class="app-footer"><span>Made by Naitik</span></div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div id="addTaskModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('addTaskModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="addTaskTitle"><i class="fas fa-plus-circle"></i> Add New Task</h3>
+        <button class="modal-close" onclick="closeModal('addTaskModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label>Task Name</label><input type="text" id="taskNameInput" placeholder="Enter task name..."></div>
+        <div class="form-group">
+          <label>Priority</label>
+          <div class="priority-selector">
+            <button class="priority-btn very-important" onclick="selectPriority('very-important')"><i class="fas fa-fire"></i> Very Important</button>
+            <button class="priority-btn important" onclick="selectPriority('important')"><i class="fas fa-exclamation-circle"></i> Important</button>
+            <button class="priority-btn normal active" onclick="selectPriority('normal')"><i class="fas fa-minus-circle"></i> Normal</button>
+            <button class="priority-btn low" onclick="selectPriority('low')"><i class="fas fa-arrow-down"></i> Low</button>
+          </div>
+        </div>
+        <div class="form-group"><label>Date</label><input type="date" id="taskDateInput"></div>
+        <div class="form-group">
+          <label>Color (Optional)</label>
+          <div class="color-picker">
+            <button class="color-btn" style="background:#ff6b6b" onclick="selectColor('#ff6b6b',this)"></button>
+            <button class="color-btn" style="background:#ffa502" onclick="selectColor('#ffa502',this)"></button>
+            <button class="color-btn" style="background:#2ed573" onclick="selectColor('#2ed573',this)"></button>
+            <button class="color-btn" style="background:#1e90ff" onclick="selectColor('#1e90ff',this)"></button>
+            <button class="color-btn" style="background:#a55eea" onclick="selectColor('#a55eea',this)"></button>
+            <button class="color-btn" style="background:#ff6348" onclick="selectColor('#ff6348',this)"></button>
+            <button class="color-btn" style="background:#26de81" onclick="selectColor('#26de81',this)"></button>
+            <button class="color-btn selected" style="background:#778ca3" onclick="selectColor('#778ca3',this)"></button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('addTaskModal')">Cancel</button>
+        <button class="btn-primary" onclick="saveTask()">Save Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Tasks Modal -->
+  <div id="dailyTasksModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('dailyTasksModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-redo"></i> Manage Daily Tasks</h3>
+        <button class="modal-close" onclick="closeModal('dailyTasksModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label>Add Daily Task</label><div class="inline-form"><input type="text" id="dailyTaskInput" placeholder="Task that repeats daily..."><button class="btn-primary" onclick="addDailyTask()"><i class="fas fa-plus"></i></button></div></div>
+        <div class="form-group">
+          <label>Color for Daily Tasks</label>
+          <div class="color-picker">
+            <button class="color-btn daily-color-btn" style="background:#00d2d3" onclick="selectDailyColor('#00d2d3',this)"></button>
+            <button class="color-btn daily-color-btn" style="background:#ff9ff3" onclick="selectDailyColor('#ff9ff3',this)"></button>
+            <button class="color-btn daily-color-btn selected" style="background:#48dbfb" onclick="selectDailyColor('#48dbfb',this)"></button>
+            <button class="color-btn daily-color-btn" style="background:#feca57" onclick="selectDailyColor('#feca57',this)"></button>
+            <button class="color-btn daily-color-btn" style="background:#ff6b6b" onclick="selectDailyColor('#ff6b6b',this)"></button>
+          </div>
+        </div>
+        <div id="dailyTasksManagerList" class="daily-tasks-manager"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Skill Modal -->
+  <div id="addSkillModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('addSkillModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header"><h3><i class="fas fa-brain"></i> Add Skill</h3><button class="modal-close" onclick="closeModal('addSkillModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Skill Title</label><input type="text" id="skillTitleInput" placeholder="e.g., JavaScript, Guitar..."></div>
+        <div class="form-group"><label>Notes</label><textarea id="skillNotesInput" placeholder="Write about your skill, progress..." rows="6"></textarea></div>
+        <div class="form-group"><label>Skill Level</label><select id="skillLevelInput"><option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Expert</option></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('addSkillModal')">Cancel</button><button class="btn-primary" onclick="saveSkill()">Save Skill</button></div>
+    </div>
+  </div>
+
+  <!-- View Skill Modal -->
+  <div id="viewSkillModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('viewSkillModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header"><h3 id="viewSkillTitle"></h3><button class="modal-close" onclick="closeModal('viewSkillModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body"><div class="skill-detail-level" id="viewSkillLevel"></div><div class="skill-detail-notes" id="viewSkillNotes"></div></div>
+      <div class="modal-footer"><button class="btn-cancel" onclick="deleteSkill()"><i class="fas fa-trash"></i> Delete</button><button class="btn-primary" onclick="editSkill()"><i class="fas fa-edit"></i> Edit</button></div>
+    </div>
+  </div>
+
+  <!-- Add Goal Modal -->
+  <div id="addGoalModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('addGoalModal')"></div>
+    <div class="modal-content">
+      <div class="modal-header"><h3><i class="fas fa-star"></i> Add Life Goal</h3><button class="modal-close" onclick="closeModal('addGoalModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Goal Title</label><input type="text" id="goalTitleInput" placeholder="e.g., Build a startup..."></div>
+        <div class="form-group"><label>Description</label><textarea id="goalDescInput" placeholder="Describe your goal..." rows="5"></textarea></div>
+        <div class="form-group"><label>Category</label><select id="goalCategoryInput"><option>Career</option><option>Health</option><option>Education</option><option>Finance</option><option>Personal</option><option>Travel</option><option>Relationship</option><option>Other</option></select></div>
+        <div class="form-group"><label>Target Date (Optional)</label><input type="date" id="goalTargetDate"></div>
+      </div>
+      <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('addGoalModal')">Cancel</button><button class="btn-primary" onclick="saveLifeGoal()">Save Goal</button></div>
+    </div>
+  </div>
+
+  <!-- Quote Modal -->
+  <div id="quoteModal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('quoteModal')"></div>
+    <div class="modal-content quote-modal-content">
+      <div class="quote-full"><i class="fas fa-quote-left"></i><p id="fullQuoteText"></p><span id="fullQuoteAuthor"></span></div>
+      <button class="btn-primary" onclick="closeModal('quoteModal')">Inspire Me!</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// DATA
+let appData = {
+    tasks: [], dailyTasks: [], dailyColor: '#48dbfb',
+    skills: [], skillsPin: null, lifeGoals: [], studySessions: [], settings: {}
+};
+
+// STATE
+let selectedDate = new Date();
+let selectedPriority = 'normal';
+let selectedColor = '#778ca3';
+let editingTaskId = null;
+let viewingSkillId = null;
+let progressMonth = new Date();
+let chartPage = 0;
+let studyMonth = new Date();
+let swInterval = null, swRunning = false, swElapsed = 0, swStartTimestamp = null;
+let tmInterval = null, tmRunning = false, tmRemaining = 0, tmTotal = 0;
+
+const quotes = [
+    {text:"The secret of getting ahead is getting started.",author:"Mark Twain"},
+    {text:"It's not about having time, it's about making time.",author:"Unknown"},
+    {text:"Don't watch the clock; do what it does. Keep going.",author:"Sam Levenson"},
+    {text:"Success is the sum of small efforts repeated day in and day out.",author:"Robert Collier"},
+    {text:"The only way to do great work is to love what you do.",author:"Steve Jobs"},
+    {text:"Believe you can and you're halfway there.",author:"Theodore Roosevelt"},
+    {text:"Hard work beats talent when talent doesn't work hard.",author:"Tim Notke"},
+    {text:"The future depends on what you do today.",author:"Mahatma Gandhi"},
+    {text:"Discipline is the bridge between goals and accomplishment.",author:"Jim Rohn"},
+    {text:"You don't have to be great to start, but you have to start to be great.",author:"Zig Ziglar"},
+    {text:"Push yourself, because no one else is going to do it for you.",author:"Unknown"},
+    {text:"Great things never come from comfort zones.",author:"Unknown"},
+    {text:"Do something today that your future self will thank you for.",author:"Sean Patrick Flanery"},
+    {text:"Wake up with determination. Go to bed with satisfaction.",author:"Unknown"},
+    {text:"Don't stop when you're tired. Stop when you're done.",author:"Unknown"}
+];
+
+// INIT
+document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    setTimeout(() => {
+        document.getElementById('splashScreen').style.display = 'none';
+        document.getElementById('mainApp').classList.remove('hidden');
+        initApp();
+    }, 2800);
+});
+
+function initApp() {
+    updateHeaderDate();
+    setRandomQuote();
+    updateDateDisplay();
+    renderTasks();
+    renderProgress();
+    renderStudy();
+    renderSkills();
+    renderLifeGoals();
+    loadHistory();
+    document.getElementById('taskDateInput').value = formatDateInput(selectedDate);
+}
+
+function saveData() {
+    try { localStorage.setItem('taskflow_pro_data', JSON.stringify(appData)); } catch(e) {}
+}
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem('taskflow_pro_data');
+        if (saved) appData = {...appData, ...JSON.parse(saved)};
+    } catch(e) {}
+}
+
+// DATE HELPERS
+function formatDate(date) {
+    const d = new Date(date);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function formatDateInput(date) { return formatDate(date); }
+function formatDateDisplay(date) {
+    const d = new Date(date);
+    return d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+function formatMonthYear(date) {
+    return new Date(date).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+}
+function getDaysInMonth(year,month) { return new Date(year,month+1,0).getDate(); }
+
+function updateHeaderDate() {
+    document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+}
+
+function setRandomQuote() {
+    const q = quotes[Math.floor(Math.random()*quotes.length)];
+    document.getElementById('quoteText').textContent = q.text;
+    document.getElementById('quoteAuthor').textContent = '— '+q.author;
+}
+
+function showQuote() {
+    const q = quotes[Math.floor(Math.random()*quotes.length)];
+    document.getElementById('fullQuoteText').textContent = q.text;
+    document.getElementById('fullQuoteAuthor').textContent = '— '+q.author;
+    openModal('quoteModal');
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-'+tab).classList.add('active');
+    document.querySelector('[data-tab="'+tab+'"]').classList.add('active');
+    const fab = document.querySelector('.fab-add');
+    fab.style.display = tab==='tasks' ? 'flex' : 'none';
+    if(tab==='progress') renderProgress();
+    if(tab==='study') renderStudy();
+    if(tab==='skills') renderSkills();
+    if(tab==='lifegoals') renderLifeGoals();
+    if(tab==='history') loadHistory();
+}
+
+function changeDate(dir) {
+    selectedDate = new Date(selectedDate);
+    selectedDate.setDate(selectedDate.getDate()+dir);
+    updateDateDisplay();
+    renderTasks();
+}
+
+function goToToday() { selectedDate = new Date(); updateDateDisplay(); renderTasks(); }
+function updateDateDisplay() { document.getElementById('currentDateDisplay').textContent = formatDateDisplay(selectedDate); }
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if(existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2500);
+}
+
+// TASKS
+function openAddTask() {
+    editingTaskId = null;
+    document.getElementById('addTaskTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Task';
+    document.getElementById('taskNameInput').value = '';
+    document.getElementById('taskDateInput').value = formatDateInput(selectedDate);
+    selectPriority('normal');
+    document.querySelectorAll('.color-picker .color-btn:not(.daily-color-btn)').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.color-picker .color-btn:not(.daily-color-btn)')[7].classList.add('selected');
+    selectedColor = '#778ca3';
+    openModal('addTaskModal');
+    setTimeout(() => document.getElementById('taskNameInput').focus(), 300);
+}
+
+function selectPriority(p) {
+    selectedPriority = p;
+    document.querySelectorAll('.priority-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.priority-btn.'+p).classList.add('active');
+}
+
+function selectColor(c, btn) {
+    selectedColor = c;
+    document.querySelectorAll('.color-picker .color-btn:not(.daily-color-btn)').forEach(b => b.classList.remove('selected'));
+    if(btn) btn.classList.add('selected');
+}
+
+function selectDailyColor(c, btn) {
+    appData.dailyColor = c;
+    document.querySelectorAll('.daily-color-btn').forEach(b => b.classList.remove('selected'));
+    if(btn) btn.classList.add('selected');
+    saveData();
+}
+
+function saveTask() {
+    const name = document.getElementById('taskNameInput').value.trim();
+    const date = document.getElementById('taskDateInput').value;
+    if(!name) { showToast('Please enter a task name'); return; }
+    if(editingTaskId) {
+        const task = appData.tasks.find(t => t.id===editingTaskId);
+        if(task) { task.name=name; task.priority=selectedPriority; task.date=date; task.color=selectedColor; }
+        showToast('Task updated! ✏️');
+    } else {
+        appData.tasks.push({
+            id: Date.now().toString()+Math.random().toString(36).substr(2,5),
+            name, priority:selectedPriority, date, color:selectedColor,
+            completed:false, createdAt:new Date().toISOString()
+        });
+        showToast('Task added! 🎯');
+    }
+    saveData(); closeModal('addTaskModal'); renderTasks();
+}
+
+function toggleTask(id, isDaily) {
+    if(isDaily) {
+        const dateKey = formatDate(selectedDate);
+        const task = appData.tasks.find(t => t.dailyRef===id && t.date===dateKey);
+        if(task) { task.completed = !task.completed; }
+        else {
+            const dt = appData.dailyTasks.find(d => d.id===id);
+            if(dt) appData.tasks.push({id:Date.now().toString()+Math.random().toString(36).substr(2,5),name:dt.name,priority:'daily',date:dateKey,color:appData.dailyColor,completed:true,dailyRef:id,createdAt:new Date().toISOString()});
+        }
+    } else {
+        const task = appData.tasks.find(t => t.id===id);
+        if(task) task.completed = !task.completed;
+    }
+    saveData(); renderTasks();
+}
+
+function deleteTask(id) {
+    if(confirm('Delete this task?')) {
+        appData.tasks = appData.tasks.filter(t => t.id!==id);
+        saveData(); renderTasks(); showToast('Task deleted 🗑️');
+    }
+}
+
+function editTask(id) {
+    const task = appData.tasks.find(t => t.id===id);
+    if(!task) return;
+    editingTaskId = id;
+    document.getElementById('addTaskTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Task';
+    document.getElementById('taskNameInput').value = task.name;
+    document.getElementById('taskDateInput').value = task.date;
+    selectPriority(task.priority);
+    selectedColor = task.color;
+    openModal('addTaskModal');
+}
+
+function renderTasks() {
+    const dateKey = formatDate(selectedDate);
+    ensureDailyTaskInstances(dateKey);
+    const dayTasks = appData.tasks.filter(t => t.date===dateKey);
+    renderTaskSection('dailyTasksList', dayTasks.filter(t => t.priority==='daily'), 'dailyTasksHeader', true);
+    renderTaskSection('veryImportantList', dayTasks.filter(t => t.priority==='very-important'), 'veryImportantHeader');
+    renderTaskSection('importantList', dayTasks.filter(t => t.priority==='important'), 'importantHeader');
+    renderTaskSection('normalList', dayTasks.filter(t => t.priority==='normal'), 'normalHeader');
+    renderTaskSection('lowList', dayTasks.filter(t => t.priority==='low'), 'lowHeader');
+    const total = dayTasks.length, completed = dayTasks.filter(t => t.completed).length;
+    document.getElementById('totalTasks').textContent = total;
+    document.getElementById('completedTasks').textContent = completed;
+    document.getElementById('pendingTasks').textContent = total-completed;
+    document.getElementById('emptyState').style.display = total===0 ? 'block' : 'none';
+}
+
+function ensureDailyTaskInstances(dateKey) {
+    let changed = false;
+    appData.dailyTasks.forEach(dt => {
+        if(!appData.tasks.find(t => t.dailyRef===dt.id && t.date===dateKey)) {
+            appData.tasks.push({id:Date.now().toString()+Math.random().toString(36).substr(2,5)+dt.id,name:dt.name,priority:'daily',date:dateKey,color:appData.dailyColor,completed:false,dailyRef:dt.id,createdAt:new Date().toISOString()});
+            changed = true;
+        }
+    });
+    if(changed) saveData();
+}
+
+function renderTaskSection(listId, tasks, headerId, isDaily) {
+    const list = document.getElementById(listId);
+    const header = document.getElementById(headerId);
+    if(tasks.length===0) { list.innerHTML=''; header.style.display='none'; return; }
+    header.style.display='flex';
+    const labels = {'very-important':'V.IMP','important':'IMP','daily':'DAILY','low':'LOW','normal':'NORMAL'};
+    list.innerHTML = tasks.map(task => {
+        const pc='priority-'+task.priority, cc=task.completed?'completed':'', ck=task.completed?'checked':'', bc='badge-'+task.priority;
+        return `<div class="task-item ${pc} ${cc}">
+            <div class="task-checkbox ${ck}" onclick="toggleTask('${isDaily?task.dailyRef:task.id}',${!!isDaily})"></div>
+            <div class="task-info" onclick="${!isDaily?"editTask('"+task.id+"')":''}">
+                <div class="task-name" style="color:${task.completed?'':task.color}">${escapeHtml(task.name)}</div>
+                <div class="task-meta"><span class="task-priority-badge ${bc}">${labels[task.priority]||'NORMAL'}</span></div>
+            </div>
+            ${!isDaily?`<button class="task-delete" onclick="deleteTask('${task.id}')"><i class="fas fa-trash-alt"></i></button>`:''}
+            <div class="task-color-bar" style="background:${task.color}"></div>
+        </div>`;
+    }).join('');
+}
+
+function escapeHtml(text) { const d=document.createElement('div'); d.textContent=text; return d.innerHTML; }
+
+// DAILY TASKS
+function openManageDailyTasks() { renderDailyTasksManager(); openModal('dailyTasksModal'); }
+
+function addDailyTask() {
+    const name = document.getElementById('dailyTaskInput').value.trim();
+    if(!name) { showToast('Enter a task name'); return; }
+    appData.dailyTasks.push({id:'daily_'+Date.now(),name});
+    document.getElementById('dailyTaskInput').value='';
+    saveData(); renderDailyTasksManager(); renderTasks(); showToast('Daily task added! 🔄');
+}
+
+function removeDailyTask(id) {
+    if(confirm('Remove this daily task?')) {
+        appData.dailyTasks = appData.dailyTasks.filter(d => d.id!==id);
+        const today = formatDate(new Date());
+        appData.tasks = appData.tasks.filter(t => !(t.dailyRef===id && t.date>=today && !t.completed));
+        saveData(); renderDailyTasksManager(); renderTasks(); showToast('Daily task removed 🗑️');
+    }
+}
+
+function renderDailyTasksManager() {
+    const list = document.getElementById('dailyTasksManagerList');
+    if(appData.dailyTasks.length===0) { list.innerHTML='<p style="text-align:center;color:var(--text-secondary);font-size:12px;padding:20px">No daily tasks set</p>'; return; }
+    list.innerHTML = appData.dailyTasks.map(dt => `
+        <div class="daily-task-manage-item">
+            <span>${escapeHtml(dt.name)}</span>
+            <button onclick="removeDailyTask('${dt.id}')"><i class="fas fa-times"></i></button>
+        </div>`).join('');
+}
+
+// PROGRESS
+function changeProgressMonth(dir) { progressMonth=new Date(progressMonth); progressMonth.setMonth(progressMonth.getMonth()+dir); chartPage=0; renderProgress(); }
+function scrollChart(dir) { chartPage+=dir; renderDailyChart(); }
+
+function renderProgress() {
+    document.getElementById('progressMonthDisplay').textContent = formatMonthYear(progressMonth);
+    renderMonthlyCircle(); renderDailyChart(); renderYearlyGrid();
+}
+
+function renderMonthlyCircle() {
+    const year=progressMonth.getFullYear(), month=progressMonth.getMonth(), days=getDaysInMonth(year,month);
+    let total=0, completed=0;
+    for(let d=1;d<=days;d++) {
+        const dk=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        const dt=appData.tasks.filter(t=>t.date===dk);
+        total+=dt.length; completed+=dt.filter(t=>t.completed).length;
+    }
+    const pct=total>0?Math.round((completed/total)*100):0;
+    const offset=326.7-(pct/100)*326.7;
+    document.getElementById('monthlyCircleFill').style.strokeDashoffset=offset;
+    document.getElementById('monthlyPercent').textContent=pct+'%';
+    document.getElementById('monthCompleted').textContent=completed;
+    document.getElementById('monthTotal').textContent=total;
+    document.getElementById('monthMissed').textContent=total-completed;
+}
+
+function renderDailyChart() {
+    const year=progressMonth.getFullYear(), month=progressMonth.getMonth(), days=getDaysInMonth(year,month);
+    const perPage=7, maxPage=Math.ceil(days/perPage)-1;
+    if(chartPage<0) chartPage=0; if(chartPage>maxPage) chartPage=maxPage;
+    const start=chartPage*perPage+1, end=Math.min(start+perPage-1,days);
+    document.getElementById('chartRangeLabel').textContent=`Day ${start} - ${end} of ${days}`;
+    let maxTotal=1;
+    for(let d=start;d<=end;d++) {
+        const dk=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        const l=appData.tasks.filter(t=>t.date===dk).length;
+        if(l>maxTotal) maxTotal=l;
+    }
+    let html='';
+    for(let d=start;d<=end;d++) {
+        const dk=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        const dt=appData.tasks.filter(t=>t.date===dk);
+        const comp=dt.filter(t=>t.completed).length, miss=dt.length-comp;
+        const ch=dt.length>0?(comp/maxTotal)*80:0, mh=dt.length>0?(miss/maxTotal)*80:0;
+        html+=`<div class="chart-bar-group"><div class="chart-bar-stack"><div class="chart-bar-segment missed-bar" style="height:${mh}px"></div><div class="chart-bar-segment completed-bar" style="height:${ch}px"></div></div><div class="chart-bar-label">${d}</div></div>`;
+    }
+    document.getElementById('dailyChart').innerHTML=html;
+}
+
+function renderYearlyGrid() {
+    const year=new Date().getFullYear();
+    document.getElementById('yearLabel').textContent=year;
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    let html='';
+    for(let m=0;m<12;m++) {
+        const days=getDaysInMonth(year,m); let total=0,completed=0;
+        for(let d=1;d<=days;d++) {
+            const dk=year+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+            const dt=appData.tasks.filter(t=>t.date===dk);
+            total+=dt.length; completed+=dt.filter(t=>t.completed).length;
+        }
+        const pct=total>0?Math.round((completed/total)*100):0;
+        const intensity=total>0?Math.max(0.2,pct/100):0.05;
+        const color=total>0?`rgba(46,213,115,${intensity})`:'rgba(255,255,255,0.03)';
+        html+=`<div class="year-month-cell" style="background:${color}" onclick="progressMonth=new Date(${year},${m},1);chartPage=0;renderProgress()"><span class="month-abbr">${months[m]}</span><span class="month-pct">${total>0?pct+'%':'-'}</span></div>`;
+    }
+    document.getElementById('yearlyGrid').innerHTML=html;
+}
+
+// STUDY
+function renderStudy() { renderTodaySessions(); renderStudyChart(); renderStudyHistory(); }
+
+function toggleStopwatch() { swRunning?stopStopwatch():startStopwatch(); }
+
+function startStopwatch() {
+    swRunning=true; swStartTimestamp=new Date();
+    const btn=document.getElementById('swStartBtn');
+    btn.innerHTML='<i class="fas fa-pause"></i> Pause'; btn.classList.add('running');
+    document.getElementById('swRunningInfo').style.display='block';
+    document.getElementById('swStartTime').textContent=swStartTimestamp.toLocaleTimeString('en-IN');
+    const startElapsed=swElapsed, startTime=Date.now();
+    swInterval=setInterval(()=>{ swElapsed=startElapsed+Math.floor((Date.now()-startTime)/1000); updateStopwatchDisplay(); },1000);
+}
+
+function stopStopwatch() {
+    clearInterval(swInterval); swRunning=false;
+    const btn=document.getElementById('swStartBtn');
+    btn.innerHTML='<i class="fas fa-play"></i> Resume'; btn.classList.remove('running');
+    if(swElapsed>=10&&swStartTimestamp) {
+        const session={id:Date.now().toString(),startTime:swStartTimestamp.toISOString(),endTime:new Date().toISOString(),duration:swElapsed,date:formatDate(new Date())};
+        appData.studySessions.push(session); saveData();
+        showToast('Session saved! 📚 '+formatDuration(swElapsed));
+        renderStudy();
+    }
+}
+
+function resetStopwatch() {
+    clearInterval(swInterval); swRunning=false; swElapsed=0; swStartTimestamp=null;
+    updateStopwatchDisplay();
+    const btn=document.getElementById('swStartBtn');
+    btn.innerHTML='<i class="fas fa-play"></i> Start'; btn.classList.remove('running');
+    document.getElementById('swRunningInfo').style.display='none';
+}
+
+function updateStopwatchDisplay() { document.getElementById('stopwatchTime').textContent=formatTime(swElapsed); }
+
+function formatTime(s) {
+    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+    return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}
+
+function formatDuration(s) {
+    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sec=s%60;
+    if(h>0) return h+'h '+m+'m '+sec+'s';
+    if(m>0) return m+'m '+sec+'s';
+    return sec+'s';
+}
+
+function formatDurationShort(s) {
+    const h=Math.floor(s/3600), m=Math.floor((s%3600)/60);
+    if(h>0) return h+'h '+m+'m'; return m+'m';
+}
+
+function setTimerPreset(mins) {
+    document.getElementById('timerHours').value=Math.floor(mins/60);
+    document.getElementById('timerMinutes').value=mins%60;
+    document.getElementById('timerSeconds').value=0;
+}
+
+function toggleTimer() { tmRunning?stopTimer():startTimer(); }
+
+function startTimer() {
+    if(tmRemaining<=0) {
+        const h=parseInt(document.getElementById('timerHours').value)||0;
+        const m=parseInt(document.getElementById('timerMinutes').value)||0;
+        const s=parseInt(document.getElementById('timerSeconds').value)||0;
+        tmRemaining=h*3600+m*60+s; tmTotal=tmRemaining;
+    }
+    if(tmRemaining<=0) { showToast('Set a time first'); return; }
+    tmRunning=true;
+    document.getElementById('timerSetup').style.display='none';
+    document.getElementById('timerDisplay').style.display='block';
+    const btn=document.getElementById('timerStartBtn');
+    btn.innerHTML='<i class="fas fa-pause"></i> Pause'; btn.classList.add('running');
+    updateTimerDisplay();
+    tmInterval=setInterval(()=>{
+        tmRemaining--;
+        updateTimerDisplay();
+        if(tmRemaining<=0) {
+            clearInterval(tmInterval); tmRunning=false;
+            btn.innerHTML='<i class="fas fa-play"></i> Start'; btn.classList.remove('running');
+            showToast('Timer finished! ⏰');
+            if(navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
+            alert('⏰ Timer Finished! Great work!');
+            resetTimer();
+        }
+    },1000);
+}
+
+function stopTimer() {
+    clearInterval(tmInterval); tmRunning=false;
+    const btn=document.getElementById('timerStartBtn');
+    btn.innerHTML='<i class="fas fa-play"></i> Resume'; btn.classList.remove('running');
+}
+
+function resetTimer() {
+    clearInterval(tmInterval); tmRunning=false; tmRemaining=0;
+    document.getElementById('timerSetup').style.display='block';
+    document.getElementById('timerDisplay').style.display='none';
+    const btn=document.getElementById('timerStartBtn');
+    btn.innerHTML='<i class="fas fa-play"></i> Start'; btn.classList.remove('running');
+}
+
+function updateTimerDisplay() { document.getElementById('timerTime').textContent=formatTime(tmRemaining); }
+
+function renderTodaySessions() {
+    const today=formatDate(new Date());
+    const sessions=appData.studySessions.filter(s=>s.date===today);
+    const total=sessions.reduce((sum,s)=>sum+s.duration,0);
+    document.getElementById('todayStudyTotal').textContent=formatDuration(total);
+    const list=document.getElementById('todaySessionsList');
+    if(sessions.length===0) { list.innerHTML='<p style="text-align:center;color:var(--text-secondary);font-size:12px;padding:15px">No sessions today</p>'; return; }
+    list.innerHTML=[...sessions].reverse().map(s=>{
+        const start=new Date(s.startTime), end=new Date(s.endTime);
+        return `<div class="session-item"><div><div class="session-time-range">${start.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})} → ${end.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="session-duration">${formatDuration(s.duration)}</div></div>`;
+    }).join('');
+}
+
+function renderStudyHistory() {
+    const list=document.getElementById('studyHistoryList');
+    const grouped={};
+    appData.studySessions.forEach(s=>{ if(!grouped[s.date]) grouped[s.date]=[]; grouped[s.date].push(s); });
+    const dates=Object.keys(grouped).sort().reverse().slice(0,30);
+    if(dates.length===0) { list.innerHTML='<p style="text-align:center;color:var(--text-secondary);font-size:12px;padding:15px">No study history yet</p>'; return; }
+    list.innerHTML=dates.map(date=>{
+        const ss=grouped[date], total=ss.reduce((sum,s)=>sum+s.duration,0);
+        return `<div class="session-item"><div><div class="session-time-range">${formatDateDisplay(date)}</div><div class="session-date">${ss.length} session(s)</div></div><div class="session-duration">${formatDuration(total)}</div></div>`;
+    }).join('');
+}
+
+function changeStudyMonth(dir) { studyMonth=new Date(studyMonth); studyMonth.setMonth(studyMonth.getMonth()+dir); renderStudyChart(); }
+
+function renderStudyChart() {
+    const year=studyMonth.getFullYear(), month=studyMonth.getMonth();
+    document.getElementById('studyMonthLabel').textContent=formatMonthYear(studyMonth);
+    const days=getDaysInMonth(year,month);
+    let maxDur=1, monthTotal=0, activeDays=0;
+    const data=[];
+    for(let d=1;d<=days;d++) {
+        const dk=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        const total=appData.studySessions.filter(s=>s.date===dk).reduce((sum,s)=>sum+s.duration,0);
+        data.push({day:d,duration:total});
+        if(total>maxDur) maxDur=total;
+        monthTotal+=total; if(total>0) activeDays++;
+    }
+    let yearTotal=0;
+    appData.studySessions.forEach(s=>{ if(new Date(s.date).getFullYear()===year) yearTotal+=s.duration; });
+    document.getElementById('studyMonthTotal').textContent=formatDurationShort(monthTotal);
+    document.getElementById('studyMonthAvg').textContent=activeDays>0?formatDurationShort(Math.round(monthTotal/activeDays)):'0m';
+    document.getElementById('studyYearTotal').textContent=formatDurationShort(yearTotal);
+    document.getElementById('studyChart').innerHTML=data.map(d=>{
+        const h=d.duration>0?Math.max(4,(d.duration/maxDur)*80):0;
+        return `<div class="chart-bar-group"><div class="chart-bar-stack"><div class="chart-bar-segment completed-bar" style="height:${h}px"></div></div><div class="chart-bar-label">${d.day}</div></div>`;
+    }).join('');
+}
+
+// SKILLS
+function renderSkills() {
+    const pin=appData.skillsPin;
+    const lock=document.getElementById('skillsLockScreen');
+    const content=document.getElementById('skillsContent');
+    const setPinBtn=document.getElementById('skillsSetPinBtn');
+    if(!pin) { lock.style.display='flex'; content.classList.add('hidden'); setPinBtn.style.display='block'; document.querySelector('#skillsLockScreen p').textContent='Set a PIN to protect your Skills'; }
+    else if(content.classList.contains('hidden')) { lock.style.display='flex'; setPinBtn.style.display='none'; document.querySelector('#skillsLockScreen p').textContent='Enter PIN to access your Skills'; }
+    renderSkillsList();
+}
+
+function setSkillsPin() {
+    const pin=document.getElementById('skillsPinInput').value;
+    if(pin.length!==4||isNaN(pin)) { showToast('PIN must be 4 digits'); return; }
+    appData.skillsPin=pin; saveData(); showToast('PIN set! 🔐'); unlockSkills();
+}
+
+function unlockSkills() {
+    const pin=document.getElementById('skillsPinInput').value;
+    if(!appData.skillsPin) { setSkillsPin(); return; }
+    if(pin!==appData.skillsPin) { showToast('Wrong PIN ❌'); return; }
+    document.getElementById('skillsLockScreen').style.display='none';
+    document.getElementById('skillsContent').classList.remove('hidden');
+    document.getElementById('skillsPinInput').value='';
+    renderSkillsList();
+}
+
+function renderSkillsList() {
+    const list=document.getElementById('skillsList'), empty=document.getElementById('emptySkills');
+    if(appData.skills.length===0) { list.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display='none';
+    list.innerHTML=appData.skills.map(s=>`<div class="skill-card" onclick="viewSkill('${s.id}')"><h4>${escapeHtml(s.title)}</h4><span class="skill-level-badge level-${s.level}">${s.level}</span></div>`).join('');
+}
+
+function openAddSkill() {
+    if(appData.skillsPin&&document.getElementById('skillsContent').classList.contains('hidden')) { showToast('Unlock skills first'); return; }
+    document.getElementById('skillTitleInput').value='';
+    document.getElementById('skillNotesInput').value='';
+    document.getElementById('skillLevelInput').value='Beginner';
+    viewingSkillId=null; openModal('addSkillModal');
+}
+
+function saveSkill() {
+    const title=document.getElementById('skillTitleInput').value.trim();
+    const notes=document.getElementById('skillNotesInput').value.trim();
+    const level=document.getElementById('skillLevelInput').value;
+    if(!title) { showToast('Enter a skill title'); return; }
+    if(viewingSkillId) {
+        const s=appData.skills.find(s=>s.id===viewingSkillId);
+        if(s) { s.title=title; s.notes=notes; s.level=level; }
+        showToast('Skill updated! ✏️');
+    } else {
+        appData.skills.push({id:'skill_'+Date.now(),title,notes,level,createdAt:new Date().toISOString()});
+        showToast('Skill added! 🧠');
+    }
+    saveData(); closeModal('addSkillModal'); renderSkillsList();
+}
+
+function viewSkill(id) {
+    const s=appData.skills.find(s=>s.id===id); if(!s) return;
+    viewingSkillId=id;
+    document.getElementById('viewSkillTitle').textContent=s.title;
+    document.getElementById('viewSkillLevel').innerHTML=`<span class="skill-level-badge level-${s.level}">${s.level}</span>`;
+    document.getElementById('viewSkillNotes').textContent=s.notes||'No notes added.';
+    openModal('viewSkillModal');
+}
+
+function editSkill() {
+    const s=appData.skills.find(s=>s.id===viewingSkillId); if(!s) return;
+    closeModal('viewSkillModal');
+    document.getElementById('skillTitleInput').value=s.title;
+    document.getElementById('skillNotesInput').value=s.notes;
+    document.getElementById('skillLevelInput').value=s.level;
+    openModal('addSkillModal');
+}
+
+function deleteSkill() {
+    if(confirm('Delete this skill?')) {
+        appData.skills=appData.skills.filter(s=>s.id!==viewingSkillId);
+        saveData(); closeModal('viewSkillModal'); renderSkillsList(); showToast('Skill deleted 🗑️');
+    }
+}
+
+// GOALS
+function renderLifeGoals() {
+    const list=document.getElementById('lifeGoalsList'), empty=document.getElementById('emptyGoals');
+    if(appData.lifeGoals.length===0) { list.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display='none';
+    const catColors={Career:'#e94560',Health:'#2ed573',Education:'#1e90ff',Finance:'#ffa502',Personal:'#a55eea',Travel:'#ff6348',Relationship:'#ff9ff3',Other:'#778ca3'};
+    list.innerHTML=appData.lifeGoals.map(g=>{
+        const cc=catColors[g.category]||'#778ca3';
+        return `<div class="goal-card ${g.completed?'goal-completed':''}" style="border-left-color:${cc}">
+            <span class="goal-category" style="background:${cc}22;color:${cc}">${g.category}</span>
+            <div class="goal-actions">
+                <button onclick="toggleGoal('${g.id}')"><i class="fas fa-${g.completed?'undo':'check'}"></i></button>
+                <button onclick="deleteGoal('${g.id}')"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <h4>${escapeHtml(g.title)}</h4>
+            ${g.description?`<p class="goal-desc">${escapeHtml(g.description)}</p>`:''}
+            ${g.targetDate?`<div class="goal-target"><i class="fas fa-calendar"></i> Target: ${formatDateDisplay(g.targetDate)}</div>`:''}
+        </div>`;
+    }).join('');
+}
+
+function openAddLifeGoal() {
+    document.getElementById('goalTitleInput').value='';
+    document.getElementById('goalDescInput').value='';
+    document.getElementById('goalCategoryInput').value='Career';
+    document.getElementById('goalTargetDate').value='';
+    openModal('addGoalModal');
+}
+
+function saveLifeGoal() {
+    const title=document.getElementById('goalTitleInput').value.trim();
+    if(!title) { showToast('Enter a goal title'); return; }
+    appData.lifeGoals.push({id:'goal_'+Date.now(),title,description:document.getElementById('goalDescInput').value.trim(),category:document.getElementById('goalCategoryInput').value,targetDate:document.getElementById('goalTargetDate').value||null,completed:false,createdAt:new Date().toISOString()});
+    saveData(); closeModal('addGoalModal'); renderLifeGoals(); showToast('Goal added! 🌟');
+}
+
+function toggleGoal(id) {
+    const g=appData.lifeGoals.find(g=>g.id===id);
+    if(g) { g.completed=!g.completed; saveData(); renderLifeGoals(); showToast(g.completed?'Goal completed! 🎉':'Goal reopened'); }
+}
+
+function deleteGoal(id) {
+    if(confirm('Delete this life goal?')) {
+        appData.lifeGoals=appData.lifeGoals.filter(g=>g.id!==id);
+        saveData(); renderLifeGoals(); showToast('Goal deleted 🗑️');
+    }
+}
+
+// HISTORY
+function loadHistory() {
+    const filter=document.getElementById('historyFilter').value;
+    let tasks=[...appData.tasks];
+    const now=new Date();
+    if(filter==='week') { const w=new Date(now); w.setDate(w.getDate()-7); tasks=tasks.filter(t=>new Date(t.date)>=w); }
+    else if(filter==='month') { const m=new Date(now); m.setMonth(m.getMonth()-1); tasks=tasks.filter(t=>new Date(t.date)>=m); }
+    else if(filter==='3months') { const m=new Date(now); m.setMonth(m.getMonth()-3); tasks=tasks.filter(t=>new Date(t.date)>=m); }
+    const grouped={};
+    tasks.forEach(t=>{ if(!grouped[t.date]) grouped[t.date]=[]; grouped[t.date].push(t); });
+    const dates=Object.keys(grouped).sort().reverse();
+    const list=document.getElementById('historyList'), empty=document.getElementById('emptyHistory');
+    if(dates.length===0) { list.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display='none';
+    list.innerHTML=dates.map(date=>{
+        const dt=grouped[date], comp=dt.filter(t=>t.completed).length;
+        return `<div class="history-day"><div class="history-day-header"><h4>${formatDateDisplay(date)}</h4><span>${comp}/${dt.length} completed</span></div>${dt.map(t=>`<div class="history-task ${t.completed?'hist-completed':'hist-missed'}"><i class="fas fa-${t.completed?'check-circle':'times-circle'}"></i><span style="color:${t.color||'inherit'}">${escapeHtml(t.name)}</span></div>`).join('')}</div>`;
+    }).join('');
+}
+</script>
+</body>
+</html>
